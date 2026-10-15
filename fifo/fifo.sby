@@ -1,0 +1,23 @@
+# SymbiYosys job for async_fifo.   run:  sby -f fifo.sby prove
+# multiclock on: wclk and rclk are modelled as independent free-running clocks.
+[tasks]
+prove
+cover
+
+[options]
+prove: mode prove
+cover: mode cover
+cover: depth 30
+multiclock on
+
+[engines]
+prove: abc pdr
+cover: smtbmc yices
+
+[script]
+read -formal -DFORMAL async_fifo.sv
+chparam -set AW 2 -set DW 2 async_fifo
+prep -top async_fifo
+
+[files]
+async_fifo.sv

@@ -1,0 +1,12 @@
+[options]
+mode bmc
+depth 16
+multiclock on
+[engines]
+abc bmc3
+[script]
+read -formal -DFORMAL async_fifo.sv
+chparam -set AW 2 -set DW 1 async_fifo
+prep -top async_fifo
+[files]
+async_fifo.sv

@@ -1,0 +1,15 @@
+obj/
+sw/build*/
+sw/bench/build/
+sw/c/*.elf
+sw/c/*.bin
+sw/c/*.hex
+tb/vec/
+synth/out/
+synth/*.lib
+*.vcd
+*.fst
+fifo/*.vvp
+fifo/fifo_prove/
+fifo/fifo_cover/
+fifo/bmc/
