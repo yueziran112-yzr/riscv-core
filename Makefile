@@ -28,19 +28,21 @@ STATS   ?=
 CFG      = $(basename $(notdir $(CORE)))_m$(MUL_IMPL)_bp$(BP)$(if $(STATS),_stats)
 OBJ     ?= obj/$(CFG)
 SIM      = $(OBJ)/Vtb_top
-VFLAGS   = --binary --timing --trace -Wno-fatal -Wno-WIDTH -Wno-UNOPTFLAT -O2 --top-module tb_top \
+# Apple clang defaults to an old C++ standard; Verilator needs >= C++14 (C++20 for --timing)
+VCXX     = -CFLAGS -std=gnu++20
+VFLAGS   = --binary --timing --trace $(VCXX) -Wno-fatal -Wno-WIDTH -Wno-UNOPTFLAT -O2 --top-module tb_top \
            -GMUL_IMPL=$(MUL_IMPL) -GBP=$(BP)
 
 unit:
 	python3 scripts/gen_vectors.py tb/vec
 	@mkdir -p obj
-	verilator --binary --timing -Wno-fatal -Wno-WIDTH --Mdir obj/unit --top-module tb_leaf \
+	verilator --binary --timing $(VCXX) -Wno-fatal -Wno-WIDTH --Mdir obj/unit --top-module tb_leaf \
 	  tb/tb_leaf.sv rtl/core/regfile.sv rtl/core/imm_gen.sv rtl/core/alu.sv rtl/core/branch_cmp.sv rtl/core/lsu.sv >/dev/null
 	./obj/unit/Vtb_leaf
 
 muldiv:
 	@mkdir -p obj
-	verilator --binary --timing -Wno-fatal -Wno-WIDTH -GMUL_IMPL=$(MUL_IMPL) --Mdir obj/muldiv_m$(MUL_IMPL) \
+	verilator --binary --timing $(VCXX) -Wno-fatal -Wno-WIDTH -GMUL_IMPL=$(MUL_IMPL) --Mdir obj/muldiv_m$(MUL_IMPL) \
 	  --top-module tb_muldiv tb/tb_muldiv.sv $(RTL_LIB) >/dev/null
 	./obj/muldiv_m$(MUL_IMPL)/Vtb_muldiv
 
