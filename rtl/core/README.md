@@ -1,4 +1,4 @@
-# Your RTL goes here
+# RTL goes here
 
 The Makefile compiles EVERY .sv file in this folder, except files named riscv_*.sv;
 the core file is chosen with CORE=rtl/core/<file>.sv (default riscv_pipe.sv).
