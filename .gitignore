@@ -13,3 +13,8 @@ fifo/*.vvp
 fifo/fifo_prove/
 fifo/fifo_cover/
 fifo/bmc/
+.DS_Store
+sw/asm/*.elf
+sw/asm/*.bin
+sw/asm/*.hex
+sw/asm/*.log

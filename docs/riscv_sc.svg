@@ -1,0 +1,236 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="960" viewBox="0 0 1500 960" font-family="Menlo, Consolas, monospace" font-size="13">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#222"/>
+    </marker>
+    <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1f5fbf"/>
+    </marker>
+    <style>
+      .box  { fill:#f4f6fa; stroke:#222; stroke-width:1.6; rx:6; }
+      .ext  { fill:#fff8e8; stroke:#b07a00; stroke-width:1.6; stroke-dasharray:6 4; rx:6; }
+      .mux  { fill:#eef3ea; stroke:#222; stroke-width:1.6; }
+      .w    { fill:none; stroke:#222; stroke-width:1.5; marker-end:url(#a); }
+      .wn   { fill:none; stroke:#222; stroke-width:1.5; }
+      .c    { fill:none; stroke:#1f5fbf; stroke-width:1.3; stroke-dasharray:4 3; marker-end:url(#ab); }
+      .t    { fill:#222; }
+      .ti   { fill:#222; font-weight:bold; font-size:15px; }
+      .mod  { fill:#666; font-size:11px; font-style:italic; }
+      .s    { fill:#222; font-size:12px; }
+      .cs   { fill:#1f5fbf; font-size:12px; }
+      .p    { fill:#555; font-size:11px; }
+      .dot  { fill:#222; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1500" height="960" fill="#ffffff"/>
+  <text x="30" y="34" font-size="20" font-weight="bold" fill="#222">Single-cycle RV32IM core — riscv_core (rtl/core/riscv_sc.sv)</text>
+  <text x="30" y="56" class="p">black = data · blue dashed = control from decoder · orange dashed = memory model in tb/tb_top.sv (outside the core) · small grey = port name on the module</text>
+
+  <!-- ================= PC ================= -->
+  <rect class="box" x="40" y="430" width="100" height="80"/>
+  <text x="90" y="466" text-anchor="middle" class="ti">PC</text>
+  <text x="90" y="484" text-anchor="middle" class="mod">reg, async rst</text>
+  <text x="90" y="500" text-anchor="middle" class="p">RESET_PC</text>
+  <text x="90" y="424" text-anchor="middle" class="p">clk, rst_n</text>
+  <!-- pc out -->
+  <path class="wn" d="M140,470 H170"/>
+  <circle class="dot" cx="170" cy="470" r="3"/>
+  <text x="150" y="462" class="s">pc</text>
+  <path class="w" d="M170,470 H200"/>
+
+  <!-- ================= Instruction memory ================= -->
+  <rect class="ext" x="200" y="420" width="120" height="100"/>
+  <text x="260" y="455" text-anchor="middle" class="ti">Instr.</text>
+  <text x="260" y="473" text-anchor="middle" class="ti">memory</text>
+  <text x="206" y="496" class="p">imem_addr</text>
+  <text x="314" y="512" text-anchor="end" class="p">imem_rdata</text>
+  <path class="w" d="M320,470 H372"/>
+  <text x="326" y="462" class="s">instr</text>
+
+  <!-- instr bus -->
+  <path class="wn" d="M372,150 V800" stroke-width="3"/>
+  <text x="378" y="815" class="s">instr[31:0]</text>
+
+  <!-- ================= decoder ================= -->
+  <rect class="box" x="400" y="80" width="205" height="250"/>
+  <text x="502" y="104" text-anchor="middle" class="ti">decoder</text>
+  <text x="502" y="120" text-anchor="middle" class="mod">u_dec</text>
+  <path class="w" d="M372,150 H400"/>
+  <text x="406" y="154" class="p">instr</text>
+  <g class="cs">
+    <text x="597" y="146" text-anchor="end">alu_op[3:0]</text>
+    <text x="597" y="162" text-anchor="end">a_sel</text>
+    <text x="597" y="178" text-anchor="end">b_sel</text>
+    <text x="597" y="194" text-anchor="end">reg_we</text>
+    <text x="597" y="210" text-anchor="end">mem_re</text>
+    <text x="597" y="226" text-anchor="end">mem_we</text>
+    <text x="597" y="242" text-anchor="end">is_branch</text>
+    <text x="597" y="258" text-anchor="end">is_jal</text>
+    <text x="597" y="274" text-anchor="end">is_jalr</text>
+    <text x="597" y="290" text-anchor="end">wb_sel[1:0]</text>
+    <text x="597" y="306" text-anchor="end">is_muldiv</text>
+  </g>
+  <text x="406" y="322" class="p">uses_rs1/2 (unused)</text>
+
+  <!-- ================= regfile ================= -->
+  <rect class="box" x="440" y="390" width="150" height="170"/>
+  <text x="515" y="480" text-anchor="middle" class="ti">regfile</text>
+  <text x="515" y="496" text-anchor="middle" class="mod">u_rf (BYPASS=0)</text>
+  <path class="w" d="M372,412 H440"/><text x="380" y="407" class="p">[19:15]</text><text x="445" y="416" class="p">ra1</text>
+  <path class="w" d="M372,440 H440"/><text x="380" y="435" class="p">[24:20]</text><text x="445" y="444" class="p">ra2</text>
+  <path class="w" d="M372,520 H440"/><text x="380" y="515" class="p">[11:7]</text><text x="445" y="524" class="p">wa</text>
+  <text x="445" y="548" class="p">wd</text>
+  <text x="515" y="380" text-anchor="middle" class="cs">we = reg_we &amp; rst_n</text>
+  <path class="c" d="M515,383 V390" />
+  <text x="584" y="416" text-anchor="end" class="p">rd1</text>
+  <text x="584" y="530" text-anchor="end" class="p">rd2</text>
+  <!-- rs1 / rs2 out -->
+  <path class="wn" d="M590,412 H640"/><circle class="dot" cx="640" cy="412" r="3"/><text x="600" y="405" class="s">rs1</text>
+  <path class="wn" d="M590,526 H625"/><circle class="dot" cx="625" cy="526" r="3"/><text x="597" y="545" class="s">rs2</text>
+
+  <!-- ================= imm_gen ================= -->
+  <rect class="box" x="420" y="620" width="170" height="70"/>
+  <text x="505" y="652" text-anchor="middle" class="ti">imm_gen</text>
+  <text x="505" y="670" text-anchor="middle" class="mod">u_imm</text>
+  <path class="w" d="M372,655 H420"/><text x="425" y="684" class="p">instr</text>
+  <path class="wn" d="M590,655 H660"/><circle class="dot" cx="660" cy="655" r="3"/><text x="596" y="648" class="s">imm</text>
+
+  <!-- ================= A mux ================= -->
+  <polygon class="mux" points="700,375 730,390 730,450 700,465"/>
+  <text x="704" y="398" class="p">1</text><text x="704" y="447" class="p">0</text>
+  <text x="715" y="366" text-anchor="middle" class="cs">a_sel</text>
+  <!-- pc to A mux (route along top) -->
+  <path class="w" d="M170,470 V350 H680 V392 H700"/>
+  <text x="560" y="344" class="s">pc</text>
+  <!-- rs1 into A mux -->
+  <path class="w" d="M640,412 V440 H700"/>
+  <!-- ================= B mux ================= -->
+  <polygon class="mux" points="700,490 730,505 730,565 700,580"/>
+  <text x="704" y="513" class="p">0</text><text x="704" y="563" class="p">1</text>
+  <text x="715" y="598" text-anchor="middle" class="cs">b_sel</text>
+  <path class="w" d="M625,526 V510 H700"/>
+  <path class="w" d="M660,655 V560 H700"/>
+
+  <!-- ================= ALU ================= -->
+  <polygon class="box" points="790,380 870,420 870,520 790,560 790,490 805,470 790,450" style="rx:0"/>
+  <text x="835" y="474" text-anchor="middle" class="ti">alu</text>
+  <text x="835" y="490" text-anchor="middle" class="mod">u_alu</text>
+  <path class="w" d="M730,420 H790"/><text x="738" y="414" class="s">alu_a</text><text x="796" y="416" class="p">a</text>
+  <path class="w" d="M730,535 H790"/><text x="738" y="529" class="s">alu_b</text><text x="796" y="531" class="p">b</text>
+  <text x="835" y="372" text-anchor="middle" class="cs">op = alu_op</text>
+  <path class="c" d="M835,376 V398"/>
+  <text x="864" y="474" text-anchor="end" class="p">y</text>
+  <path class="wn" d="M870,470 H930"/><circle class="dot" cx="930" cy="470" r="3"/>
+  <text x="880" y="462" class="s">alu_y</text>
+
+  <!-- ================= branch_cmp ================= -->
+  <rect class="box" x="790" y="160" width="160" height="90"/>
+  <text x="870" y="196" text-anchor="middle" class="ti">branch_cmp</text>
+  <text x="870" y="212" text-anchor="middle" class="mod">u_br</text>
+  <text x="796" y="234" class="p">a=rs1  b=rs2</text>
+  <text x="796" y="176" class="p">funct3</text>
+  <path class="w" d="M640,412 V230 H790"/>
+  <path class="w" d="M625,510 V244 H790" stroke-dasharray="0"/>
+  <text x="690" y="224" class="s">rs1</text><text x="690" y="258" class="s">rs2</text>
+  <path class="wn" d="M950,205 H990"/><text x="956" y="198" class="s">taken</text>
+  <path class="w" d="M990,205 V68 H60 V605"/>
+
+  <!-- ================= muldiv_comb ================= -->
+  <rect class="box" x="790" y="720" width="160" height="90"/>
+  <text x="870" y="756" text-anchor="middle" class="ti">muldiv_comb</text>
+  <text x="870" y="772" text-anchor="middle" class="mod">u_md</text>
+  <text x="796" y="796" class="p">a=rs1  b=rs2  f3</text>
+  <path class="w" d="M640,440 V740 H790" />
+  <path class="w" d="M625,526 V780 H790" />
+  <path class="wn" d="M950,765 H1260"/><text x="960" y="758" class="s">md_y</text>
+
+  <!-- funct3 note -->
+  <text x="380" y="860" class="p">instr[14:12] = funct3 → branch_cmp.funct3, muldiv_comb.f3, lsu_store.funct3, lsu_load.funct3</text>
+
+  <!-- ================= lsu_store ================= -->
+  <rect class="box" x="1000" y="260" width="160" height="100"/>
+  <text x="1080" y="282" text-anchor="middle" class="ti">lsu_store</text>
+  <text x="1080" y="297" text-anchor="middle" class="mod">u_st</text>
+  <text x="1006" y="318" class="p">wdata_in</text>
+  <text x="1006" y="344" class="p">addr_lo</text>
+  <path class="w" d="M625,244 V314 H1000" />
+  <text x="960" y="308" class="s">rs2</text>
+  <text x="1154" y="318" text-anchor="end" class="p">wdata_out</text>
+  <text x="1154" y="350" text-anchor="end" class="p">be</text>
+  <!-- ================= lsu_load ================= -->
+  <rect class="box" x="1000" y="560" width="160" height="100"/>
+  <text x="1060" y="600" text-anchor="middle" class="ti">lsu_load</text>
+  <text x="1060" y="616" text-anchor="middle" class="mod">u_ld</text>
+  <text x="1080" y="574" text-anchor="middle" class="p">rword</text>
+  <text x="1006" y="644" class="p">addr_lo</text>
+  <text x="1154" y="604" text-anchor="end" class="p">rdata</text>
+
+  <!-- alu_y distribution -->
+  <path class="w" d="M930,470 V340 H1000"/><text x="938" y="334" class="s">alu_y[1:0]</text>
+  <path class="w" d="M930,470 V640 H1000"/><text x="938" y="634" class="s">alu_y[1:0]</text>
+  <path class="w" d="M930,470 H1220"/>
+  <text x="1150" y="462" class="s">dmem_addr</text>
+
+  <!-- ================= data memory ================= -->
+  <rect class="ext" x="1220" y="250" width="140" height="260"/>
+  <text x="1290" y="380" text-anchor="middle" class="ti">Data</text>
+  <text x="1290" y="398" text-anchor="middle" class="ti">memory</text>
+  <path class="w" d="M1160,314 H1220"/><text x="1162" y="306" class="s">dmem_wdata</text>
+  <!-- be AND mem_we -->
+  <path class="wn" d="M1160,350 H1178"/>
+  <path d="M1178,338 h12 a12,12 0 0 1 0,24 h-12 z" fill="#eef3ea" stroke="#222" stroke-width="1.4"/>
+  <path class="w" d="M1202,350 H1220"/>
+  <text x="1170" y="386" class="cs">mem_we</text>
+  <path class="c" d="M1190,374 V362"/>
+  <text x="1224" y="346" class="s">dmem_be</text>
+  
+  <text x="1300" y="236" class="cs">dmem_re = mem_re</text>
+  <path class="c" d="M1290,240 V250"/>
+  <!-- rdata out -->
+  <path class="w" d="M1290,510 V535 H1080 V560"/>
+  <text x="1150" y="529" class="s">dmem_rdata</text>
+
+  <!-- ================= write-back mux ================= -->
+  <!-- is_md small mux -->
+  <polygon class="mux" points="1260,690 1285,702 1285,758 1260,770"/>
+  <text x="1263" y="712" class="p">0</text><text x="1263" y="765" class="p">1</text>
+  <text x="1300" y="785" class="cs">is_md</text>
+  <path class="w" d="M930,470 V700 H1260" />
+  <text x="1170" y="694" class="s">alu_y</text>
+  
+  <!-- main wb mux -->
+  <polygon class="mux" points="1380,560 1415,578 1415,742 1380,760"/>
+  <text x="1384" y="600" class="p">1</text><text x="1384" y="680" class="p">2</text><text x="1384" y="735" class="p">0</text>
+  <text x="1398" y="552" text-anchor="middle" class="cs">wb_sel</text>
+  <path class="w" d="M1160,600 H1380"/><text x="1250" y="594" class="s">lsu_rdata</text>
+  <path class="w" d="M1285,730 H1380"/>
+  <path class="w" d="M1330,676 H1380"/><text x="1300" y="668" class="s">pc + 4</text>
+  <!-- wb_data back to regfile wd -->
+  <path class="wn" d="M1415,660 H1460 V900 H400 V544"/>
+  <path class="w" d="M400,544 H440"/>
+  <text x="1300" y="893" class="s">wb_data</text>
+
+  <!-- ================= next PC ================= -->
+  <rect class="box" x="40" y="605" width="270" height="150"/>
+  <text x="175" y="630" text-anchor="middle" class="ti">next-PC logic</text>
+  <text x="50" y="654" class="s">is_jal | (is_branch &amp; taken):</text>
+  <text x="70" y="671" class="s">pc_next = pc + imm</text>
+  <text x="50" y="693" class="s">is_jalr:</text>
+  <text x="70" y="710" class="s">pc_next = (rs1 + imm) &amp; ~1</text>
+  <text x="50" y="732" class="s">else:</text>
+  <text x="70" y="748" class="s">pc_next = pc + 4</text>
+  <text x="66" y="598" class="s">taken</text>
+  <path class="wn" d="M175,755 V780 H20 V470"/>
+  <path class="w" d="M20,470 H40"/>
+  <text x="26" y="796" class="s">pc_next</text>
+
+  <!-- ================= retire ================= -->
+  <rect x="1000" y="80" width="460" height="130" fill="#f7f7f7" stroke="#999" stroke-dasharray="3 3" rx="6"/>
+  <text x="1012" y="102" class="ti">retire / trace ports (to tb_top)</text>
+  <text x="1012" y="124" class="s">retire_valid = rst_n          (1 instr / cycle, CPI = 1)</text>
+  <text x="1012" y="142" class="s">retire_pc    = pc        retire_instr = instr</text>
+  <text x="1012" y="160" class="s">retire_rd    = instr[11:7]</text>
+  <text x="1012" y="178" class="s">retire_we    = reg_we &amp;&amp; rd != 0</text>
+  <text x="1012" y="196" class="s">retire_data  = wb_data</text>
+</svg>

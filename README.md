@@ -16,6 +16,8 @@ to a 5-stage pipeline, then used as a platform to measure how micro-architecture
 
 ## Single-cycle core
 
+![Single-cycle datapath](docs/riscv_sc.svg)
+
 - ISA: RV32I + M extension (no CSR / interrupts, aligned memory access only)
 - Modules (`rtl/core/`):
 
