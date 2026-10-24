@@ -1,18 +1,14 @@
-// 5-stage RV32IM pipeline - version 1
+// 5-stage RV32IM pipeline - version 2 
 //   IF -> ID -> EX -> MEM -> WB
-//   * step 1  pipeline registers with a valid bit per stage
-//   * step 2  data forwarding : EX/MEM -> EX and MEM/WB -> EX
-//   * step 3  register file bypasses WB -> ID in the same cycle (regfile BYPASS=1)
-//   * step 4  load-use hazard : 1-cycle bubble
-//   * step 5  control hazard  : branch/jump resolved in EX, predict-not-taken,
-//                               flush IF/ID + ID/EX (2-cycle penalty)
-//   * step 6  redirect (flush) has priority over stall
-//   * step 7  retire interface from MEM/WB
-//     Steps 8-11 replace it with the iterative muldiv_unit.
+//   * data forwarding : EX/MEM -> EX and MEM/WB -> EX
+//   * load-use hazard : 1-cycle bubble
+//   * control hazard  : branch/jump resolved in EX, predict-not-taken, flush IF/ID + ID/EX (2-cycle penalty)
+//   * M extension     : iterative mul/div, whole front-end freezes while EX waits (ex_stall)
+//   * register file bypasses WB -> ID within the same cycle
 module riscv_core #(
   parameter logic [31:0] RESET_PC = 32'h8000_0000,
-  parameter int          MUL_IMPL = 1,          // unused in version 1 (combinational mul/div)
-  parameter int          BP       = 0           // this version: static predict-not-taken only
+  parameter int          MUL_IMPL = 1,          // multiplier micro-architecture, see muldiv_unit.sv
+  parameter int          BP       = 0           // chapter 7; this version: predict-not-taken only
 ) (
   input  logic        clk, rst_n,
   output logic [31:0] imem_addr,
@@ -120,7 +116,7 @@ module riscv_core #(
 
   // ================================================================== EX
   logic [31:0] fwd_a, fwd_b, alu_a, alu_b, alu_y, md_y, ex_result;
-  logic        taken;
+  logic        taken, md_idle, md_done;
 
   // forwarding (MEM result has priority over WB result)
   always_comb begin
@@ -137,10 +133,11 @@ module riscv_core #(
   alu        u_alu (.a(alu_a), .b(alu_b), .op(idex_alu_op), .y(alu_y));
   branch_cmp u_br  (.a(fwd_a), .b(fwd_b), .funct3(idex_f3), .taken);
 
-  // M extension - version 1: combinational, finishes in one cycle, never stalls.
-  // (Steps 8-11 replace this with the multi-cycle muldiv_unit and a real ex_stall.)
-  muldiv_comb u_md (.a(fwd_a), .b(fwd_b), .f3(idex_f3), .y(md_y));
-  assign ex_stall = 1'b0;
+  // multi-cycle M unit
+  wire md_active = idex_valid && idex_is_md;
+  muldiv_unit #(.MUL_IMPL(MUL_IMPL)) u_md (.clk, .rst_n, .start(md_active & md_idle), .f3(idex_f3), .a(fwd_a), .b(fwd_b),
+                    .idle(md_idle), .done(md_done), .result(md_y));
+  assign ex_stall = md_active && !md_done;
 
   assign ex_result = (idex_wb_sel == 2'd2) ? idex_pc + 32'd4 :
                      idex_is_md            ? md_y            : alu_y;
