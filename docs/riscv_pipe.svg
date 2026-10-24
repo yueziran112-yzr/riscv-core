@@ -1,0 +1,228 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1640" height="1000" viewBox="0 0 1640 1000" font-family="Menlo, Consolas, monospace" font-size="13">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#222"/></marker>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c62828"/></marker>
+    <marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#d97706"/></marker>
+    <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7b1fa2"/></marker>
+    <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2e7d32"/></marker>
+    <style>
+      .box  { fill:#f4f6fa; stroke:#222; stroke-width:1.6; }
+      .ext  { fill:#fff8e8; stroke:#b07a00; stroke-width:1.6; stroke-dasharray:6 4; }
+      .haz  { fill:#f6eefa; stroke:#7b1fa2; stroke-width:1.6; }
+      .preg { fill:#cfd8e6; stroke:#334; stroke-width:1.4; }
+      .mux  { fill:#eef3ea; stroke:#222; stroke-width:1.5; }
+      .w    { fill:none; stroke:#222; stroke-width:1.5; marker-end:url(#a); }
+      .wn   { fill:none; stroke:#222; stroke-width:1.5; }
+      .fw   { fill:none; stroke:#c62828; stroke-width:2; marker-end:url(#ar); }
+      .fwn  { fill:none; stroke:#c62828; stroke-width:2; }
+      .rd   { fill:none; stroke:#d97706; stroke-width:2; stroke-dasharray:7 4; marker-end:url(#ao); }
+      .hz   { fill:none; stroke:#7b1fa2; stroke-width:1.6; stroke-dasharray:4 3; marker-end:url(#ap); }
+      .wb   { fill:none; stroke:#2e7d32; stroke-width:2; marker-end:url(#ag); }
+      .wbn  { fill:none; stroke:#2e7d32; stroke-width:2; }
+      .ti   { fill:#222; font-weight:bold; font-size:15px; }
+      .st   { fill:#334; font-weight:bold; font-size:18px; }
+      .mod  { fill:#666; font-size:11px; font-style:italic; }
+      .s    { fill:#222; font-size:12px; }
+      .p    { fill:#555; font-size:11px; }
+      .r    { fill:#c62828; font-size:12px; }
+      .o    { fill:#d97706; font-size:12px; }
+      .h    { fill:#7b1fa2; font-size:12px; }
+      .g    { fill:#2e7d32; font-size:12px; }
+      .dot  { fill:#222; }
+    </style>
+  </defs>
+  <rect width="1640" height="1000" fill="#fff"/>
+  <text x="30" y="32" font-size="20" font-weight="bold" fill="#222">5-stage RV32IM pipeline — riscv_core (rtl/core/riscv_pipe.sv)</text>
+  <text x="30" y="52" class="p">black = data · red = forwarding · orange dashed = redirect / flush · purple dashed = stall / bubble control · green = write-back · orange box = memory in tb_top</text>
+
+  <!-- stage labels -->
+  <text x="125" y="82" text-anchor="middle" class="st">IF</text>
+  <text x="440" y="82" text-anchor="middle" class="st">ID</text>
+  <text x="840" y="82" text-anchor="middle" class="st">EX</text>
+  <text x="1205" y="82" text-anchor="middle" class="st">MEM</text>
+  <text x="1490" y="82" text-anchor="middle" class="st">WB</text>
+
+  <!-- pipeline registers -->
+  <rect class="preg" x="250" y="110" width="22" height="750"/><text x="261" y="876" text-anchor="middle" class="s">IF/ID</text>
+  <rect class="preg" x="610" y="110" width="22" height="750"/><text x="621" y="876" text-anchor="middle" class="s">ID/EX</text>
+  <rect class="preg" x="1070" y="110" width="22" height="750"/><text x="1081" y="876" text-anchor="middle" class="s">EX/MEM</text>
+  <rect class="preg" x="1350" y="110" width="22" height="750"/><text x="1361" y="876" text-anchor="middle" class="s">MEM/WB</text>
+  <text x="261" y="892" text-anchor="middle" class="p">ifid_*</text>
+  <text x="621" y="892" text-anchor="middle" class="p">idex_*</text>
+  <text x="1081" y="892" text-anchor="middle" class="p">exmem_*</text>
+  <text x="1361" y="892" text-anchor="middle" class="p">memwb_*</text>
+  <text x="30" y="914" class="p">every pipeline register carries a valid bit (ifid_valid, idex_valid, exmem_valid, memwb_valid); a bubble = valid 0 + reg_we/mem_we/mem_re/jump flags cleared</text>
+
+  <!-- ================= IF ================= -->
+  <polygon class="mux" points="40,330 62,342 62,418 40,430"/>
+  <text x="44" y="356" class="p">+4</text><text x="44" y="420" class="p">rd</text>
+  <rect class="box" x="90" y="350" width="80" height="60" rx="6"/>
+  <text x="130" y="378" text-anchor="middle" class="ti">PC</text>
+  <text x="130" y="396" text-anchor="middle" class="mod">en = !stall_front</text>
+  <path class="w" d="M62,380 H90"/>
+  <path class="wn" d="M170,380 H200"/><circle class="dot" cx="200" cy="380" r="3"/><text x="176" y="372" class="s">pc</text>
+  <!-- pc+4 loop -->
+  <path class="w" d="M200,380 V310 H20 V352 H40"/><text x="80" y="304" class="s">pc + 4</text>
+  <!-- instr mem -->
+  <rect class="ext" x="100" y="460" width="130" height="80" rx="6"/>
+  <text x="165" y="494" text-anchor="middle" class="ti">Instr.</text><text x="165" y="512" text-anchor="middle" class="ti">memory</text>
+  <path class="w" d="M200,380 V440 H130 V460"/><text x="134" y="452" class="p">imem_addr</text>
+  <path class="w" d="M230,500 H250"/><text x="172" y="560" class="p">imem_rdata</text>
+  <path class="w" d="M200,380 H250"/>
+
+  <!-- ================= ID ================= -->
+  <path class="wn" d="M272,380 H285"/><text x="276" y="372" class="p">pc</text>
+  <path class="wn" d="M272,500 H290"/>
+  <path class="wn" d="M290,170 V720" stroke-width="3"/><text x="276" y="740" class="s">ifid_instr</text>
+  <path class="w" d="M285,380 V140 H600 V150" style="marker-end:none"/><path class="w" d="M600,140 H610"/><text x="560" y="134" class="s">ifid_pc</text>
+
+  <rect class="box" x="320" y="160" width="190" height="130" rx="6"/>
+  <text x="415" y="182" text-anchor="middle" class="ti">decoder</text>
+  <text x="415" y="198" text-anchor="middle" class="mod">u_dec</text>
+  <text x="330" y="222" class="p">d_alu_op d_a_sel d_b_sel</text>
+  <text x="330" y="238" class="p">d_reg_we d_mem_re d_mem_we</text>
+  <text x="330" y="254" class="p">d_br d_jal d_jalr d_wb_sel</text>
+  <text x="330" y="270" class="p">d_md   d_u1 d_u2 (uses_rs)</text>
+  <path class="w" d="M290,225 H320"/>
+  <path class="w" d="M510,225 H610"/><text x="520" y="218" class="s">control</text>
+
+  <rect class="box" x="340" y="330" width="170" height="170" rx="6"/>
+  <text x="425" y="418" text-anchor="middle" class="ti">regfile</text>
+  <text x="425" y="434" text-anchor="middle" class="mod">u_rf  BYPASS=1</text>
+  <path class="w" d="M290,350 H340"/><text x="296" y="344" class="p">rs1</text><text x="344" y="354" class="p">ra1</text>
+  <path class="w" d="M290,380 H340"/><text x="296" y="374" class="p">rs2</text><text x="344" y="384" class="p">ra2</text>
+  <text x="344" y="462" class="p">wa wd we</text>
+  <text x="504" y="354" text-anchor="end" class="p">rd1</text><text x="504" y="384" text-anchor="end" class="p">rd2</text>
+  <path class="w" d="M510,350 H610"/><text x="520" y="344" class="s">d_rs1</text>
+  <path class="w" d="M510,380 H610"/><text x="520" y="374" class="s">d_rs2</text>
+  <text x="350" y="488" class="p">also → idex_rs1/rs2/rd</text>
+
+  <rect class="box" x="340" y="530" width="170" height="60" rx="6"/>
+  <text x="425" y="556" text-anchor="middle" class="ti">imm_gen</text><text x="425" y="574" text-anchor="middle" class="mod">u_imm</text>
+  <path class="w" d="M290,560 H340"/>
+  <path class="w" d="M510,560 H610"/><text x="520" y="553" class="s">d_imm</text>
+
+  <!-- hazard unit -->
+  <rect class="haz" x="320" y="630" width="230" height="80" rx="6"/>
+  <text x="435" y="652" text-anchor="middle" class="ti" fill="#7b1fa2">load-use detect</text>
+  <text x="330" y="672" class="p">idex_mem_re &amp;&amp; idex_rd != 0 &amp;&amp;</text>
+  <text x="330" y="688" class="p">(d_u1 &amp;&amp; id_rs1==idex_rd ||</text>
+  <text x="330" y="702" class="p"> d_u2 &amp;&amp; id_rs2==idex_rd)</text>
+  <path class="w" d="M290,680 H320"/>
+  <path class="hz" d="M610,690 H550"/><text x="553" y="684" class="h" font-size="10">idex_mem_re,rd</text>
+  <!-- load_use outputs -->
+  <path class="hz" d="M435,710 V840 H51 V430"/><text x="60" y="855" class="h">load_use → stall_front (PC, IF/ID hold) · ID/EX bubble</text>
+
+  <!-- ================= EX ================= -->
+  <!-- forwarding muxes -->
+  <polygon class="mux" points="660,320 688,334 688,406 660,420"/>
+  <text x="664" y="340" class="p">0</text><text x="664" y="374" class="p">1</text><text x="664" y="410" class="p">2</text>
+  <text x="674" y="314" text-anchor="middle" class="r">fwd_a</text>
+  <polygon class="mux" points="660,440 688,454 688,526 660,540"/>
+  <text x="664" y="460" class="p">0</text><text x="664" y="494" class="p">1</text><text x="664" y="530" class="p">2</text>
+  <text x="674" y="556" text-anchor="middle" class="r">fwd_b</text>
+  <path class="w" d="M632,350 H660"/><path class="w" d="M632,380 V470 H660" /><text x="636" y="344" class="p">rs1_val</text><text x="636" y="466" class="p">rs2_val</text>
+  <text x="604" y="602" class="p" text-anchor="end"> </text>
+
+  <!-- forwarding sources: EX/MEM (1) and MEM/WB (2) -->
+  <path class="fwn" d="M1092,600 H1110 V810 H650"/><path class="fw" d="M650,810 V600 H645 V370 H660"/>
+  <path class="fw" d="M645,600 V490 H660" />
+  <text x="790" y="804" class="r">① exmem_result  (EX/MEM → EX, priority)</text>
+  <path class="fwn" d="M1372,640 H1390 V780 H640"/><path class="fw" d="M640,780 V410 H660"/>
+  <path class="fw" d="M640,620 V530 H660"/>
+  <text x="790" y="774" class="r">② memwb_data  (MEM/WB → EX)</text>
+
+  <!-- a/b select -->
+  <polygon class="mux" points="720,330 742,342 742,398 720,410"/>
+  <text x="731" y="324" text-anchor="middle" class="s" font-size="11">a_sel</text>
+  <polygon class="mux" points="720,450 742,462 742,518 720,530"/>
+  <text x="731" y="546" text-anchor="middle" class="s" font-size="11">b_sel</text>
+  <path class="w" d="M688,370 H720"/>
+  <path class="w" d="M688,490 H720"/>
+  <path class="w" d="M632,150 H705 V350 H720"/><text x="640" y="146" class="p">idex_pc</text>
+  <path class="w" d="M632,560 H705 V510 H720"/><text x="640" y="574" class="p">idex_imm</text>
+
+  <!-- ALU -->
+  <polygon class="box" points="780,340 850,375 850,465 780,500 780,435 793,420 780,405"/>
+  <text x="820" y="424" text-anchor="middle" class="ti">alu</text>
+  <path class="w" d="M742,370 H780"/><path class="w" d="M742,490 H780"/>
+  <path class="wn" d="M850,420 H930"/><text x="858" y="413" class="s">alu_y</text>
+
+  <!-- branch cmp -->
+  <rect class="box" x="760" y="200" width="130" height="64" rx="6"/>
+  <text x="825" y="226" text-anchor="middle" class="ti">branch_cmp</text>
+  <text x="768" y="252" class="p">fwd_a, fwd_b</text>
+  <path class="w" d="M695,370 V240 H760" /><path class="w" d="M700,490 V252 H760"/>
+
+  <!-- muldiv unit -->
+  <rect class="box" x="760" y="580" width="150" height="90" rx="6"/>
+  <text x="835" y="604" text-anchor="middle" class="ti">muldiv_unit</text>
+  <text x="835" y="620" text-anchor="middle" class="mod">u_md #(MUL_IMPL)</text>
+  <text x="768" y="640" class="p">start = md_active &amp; idle</text>
+  <text x="768" y="656" class="p">32-cycle mul / div</text>
+  <path class="w" d="M695,410 V600 H760"/><path class="w" d="M700,520 V620 H760" style="marker-end:url(#a)"/>
+  <path class="wn" d="M910,600 H950"/><text x="914" y="593" class="s">md_y</text>
+  <path class="hz" d="M835,670 V725 H200 V412"/><text x="690" y="742" class="h">ex_stall = md_active &amp;&amp; !md_done → freeze PC, IF/ID, ID/EX; bubble into EX/MEM</text>
+
+  <!-- ex_result mux -->
+  <polygon class="mux" points="960,380 990,394 990,486 960,500"/>
+  <text x="964" y="400" class="p">alu</text><text x="964" y="440" class="p">md</text><text x="964" y="492" class="p">pc+4</text>
+  <path class="w" d="M930,420 H960"/>
+  <path class="w" d="M950,600 V440 H960"/>
+  <path class="w" d="M940,488 H960"/><text x="912" y="482" class="p" text-anchor="end"> </text>
+  <path class="w" d="M990,440 H1070"/><text x="996" y="432" class="s">ex_result</text>
+  <path class="w" d="M700,520 V520"/>
+  <text x="975" y="372" text-anchor="middle" class="s" font-size="11">wb_sel/is_md</text>
+  <!-- store data -->
+  <path class="w" d="M700,540 V560 H1000 V520 H1070" style="stroke-dasharray:0"/><text x="1000" y="514" class="s">fwd_b → exmem_store</text>
+
+  <!-- redirect -->
+  <rect class="box" x="900" y="190" width="160" height="80" rx="6" style="fill:#fff3e0;stroke:#d97706"/>
+  <text x="980" y="212" text-anchor="middle" class="ti" fill="#b45309">redirect</text>
+  <text x="908" y="232" class="p">branch&amp;taken | jal | jalr</text>
+  <text x="908" y="248" class="p">pc+imm  or</text>
+  <text x="908" y="262" class="p">(rs1+imm) &amp; ~1</text>
+  <path class="w" d="M890,232 H900"/><text x="891" y="226" class="s" font-size="10">taken</text>
+  <path class="rd" d="M980,190 V120 H20 V420 H40"/>
+  <text x="300" y="104" class="o">redirect, redirect_pc → PC;  flush IF/ID + bubble ID/EX (2-cycle penalty)</text>
+
+  <!-- ================= MEM ================= -->
+  <rect class="box" x="1120" y="380" width="120" height="70" rx="6"/>
+  <text x="1180" y="406" text-anchor="middle" class="ti">lsu_store</text>
+  <text x="1128" y="432" class="p">be, wdata_out</text>
+  <path class="w" d="M1092,520 H1105 V420 H1120"/>
+  <path class="w" d="M1092,440 H1110 V400 H1120"/>
+  <rect class="ext" x="1140" y="200" width="180" height="120" rx="6"/>
+  <text x="1230" y="250" text-anchor="middle" class="ti">Data memory</text>
+  <text x="1148" y="275" class="p">dmem_addr = exmem_result</text>
+  <text x="1148" y="292" class="p">dmem_be = mem_we ? be : 0</text>
+  <path class="w" d="M1240,410 H1260 V320"/>
+  <path class="w" d="M1110,400 V260 H1140"/>
+  <rect class="box" x="1150" y="540" width="120" height="70" rx="6"/>
+  <text x="1210" y="566" text-anchor="middle" class="ti">lsu_load</text>
+  <text x="1158" y="592" class="p">rword → ld_data</text>
+  <path class="w" d="M1300,320 V520 H1210 V540"/><text x="1306" y="470" class="s">dmem_rdata</text>
+  <polygon class="mux" points="1300,560 1325,572 1325,648 1300,660"/>
+  <text x="1312" y="676" text-anchor="middle" class="s" font-size="11">mem_re</text>
+  <path class="w" d="M1270,580 H1300"/>
+  <path class="w" d="M1110,440 V640 H1300"/>
+  <path class="w" d="M1325,610 H1350"/><text x="1256" y="700" class="s">mem_wb_data</text>
+  <circle class="dot" cx="1110" cy="440" r="3"/>
+  <circle class="dot" cx="1092" cy="600" r="0"/>
+  <path class="wn" d="M1092,600 H1092"/>
+
+  <!-- ================= WB ================= -->
+  <path class="wbn" d="M1372,610 H1420 V960 H310 V475 H340"/>
+  <path class="wb" d="M310,475 H340"/>
+  <text x="560" y="954" class="g">memwb_data, memwb_rd, memwb_reg_we → regfile wd / wa / we   (written in WB, read in ID; BYPASS covers the same cycle)</text>
+  <circle class="dot" cx="1390" cy="610" r="0"/>
+  <rect x="1420" y="200" width="200" height="150" fill="#f7f7f7" stroke="#999" stroke-dasharray="3 3" rx="6"/>
+  <text x="1430" y="222" class="ti">retire (to tb_top)</text>
+  <text x="1430" y="244" class="s">retire_valid=memwb_valid</text>
+  <text x="1430" y="262" class="s">retire_pc   =memwb_pc</text>
+  <text x="1430" y="280" class="s">retire_instr=memwb_instr</text>
+  <text x="1430" y="298" class="s">retire_rd   =memwb_rd</text>
+  <text x="1430" y="316" class="s">retire_data =memwb_data</text>
+  <text x="1430" y="338" class="p">CPI = cycles / instret</text>
+  <path class="w" d="M1372,280 H1420"/>
+</svg>
