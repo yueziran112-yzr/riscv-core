@@ -18,3 +18,4 @@ sw/asm/*.elf
 sw/asm/*.bin
 sw/asm/*.hex
 sw/asm/*.log
+synth/out/

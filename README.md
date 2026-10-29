@@ -10,7 +10,7 @@ to a 5-stage pipeline, then used as a platform to measure how micro-architecture
 |---|---|---|
 | Single-cycle core | RV32IM, CPI = 1 | ✅ 48/48 riscv-tests |
 | 5-stage pipeline | forwarding, load-use stall, branch flush, iterative mul/div | ✅ 48/48, random differential tests, 9 mutants |
-| Synthesis & timing | Yosys + SKY130, Cadence Genus | ⬜ |
+| Synthesis & timing | Yosys + SKY130, Cadence Genus | ✅ Yosys/SKY130 baseline: 95.7k µm², ≈ 65 MHz est. ([details](docs/synthesis.md)) · Genus pending |
 | Multiplier study | 5 micro-architectures compared | ⬜ |
 | Branch prediction | BTB + 2-bit counters | ⬜ |
 
